@@ -8,19 +8,21 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 
 // This class generates tokens, reads them and rejects fake/expired ones
 @Component
 public class JwtUtil{
+    @Value("${jwt.secret}")
     // Secure 256-bit hexadecimal key
-    private static final String SECRET = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+    private String secret;
 
     // The key expires after 10 hours (calculation in ms)
     private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
 
     // Translates SECRET to cryptographic format for the JWT library to do math with
     private Key getSigningKey(){
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
     // Generate the token when the user successfully logs in
