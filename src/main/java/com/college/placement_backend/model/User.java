@@ -1,5 +1,7 @@
 package com.college.placement_backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 // Persistence library contains rules for translating
 // java objects to database records
 import jakarta.persistence.Entity;
@@ -25,6 +27,7 @@ public abstract class User{
     private String name;
     private String email;
 
+    @JsonIgnore
     @NotBlank(message = "Password cannot be empty")
     private String password;
 
