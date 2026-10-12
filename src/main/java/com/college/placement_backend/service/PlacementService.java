@@ -31,6 +31,10 @@ public class PlacementService{
             () -> new RuntimeException("Job not found.")
         );
 
+        if(applicationRepository.existsByStudentAndJob(student, job)){
+            return "Application Denied: You have already applied for " + job.getTitle();
+        }
+
         if(student.getCgpa() < job.getRequiredCgpa()){
             throw new IneligibleCGPAException("Application Denied: Student CGPA (" + student.getCgpa() + ") is lower than required (" + job.getRequiredCgpa() + ")");
         }
