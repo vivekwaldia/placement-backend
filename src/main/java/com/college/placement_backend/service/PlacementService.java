@@ -7,6 +7,8 @@ import com.college.placement_backend.model.Student;
 import com.college.placement_backend.repository.ApplicationRepository;
 import com.college.placement_backend.repository.JobRepository;
 import com.college.placement_backend.repository.StudentRepository;
+
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 
 // Notify spring boot that this class handles the core business logic
@@ -22,6 +24,9 @@ public class PlacementService{
         this.jobRepository = jobRepository;
     }
 
+    // Vacancies drop when a student applies for a job, if we don't evict the cache,
+    // Redis will keep serving old vacancies to new students
+    @CacheEvict(value = "jobs", allEntries = true)
     public String applyForJob(Integer studentId, Integer jobId){
         Student student = studentRepository.findById(studentId).orElseThrow(
             () -> new RuntimeException("Student not found.")
