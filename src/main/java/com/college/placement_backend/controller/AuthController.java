@@ -44,7 +44,7 @@ public class AuthController{
         if(existingUser.isPresent()){
             Map<String, String> error = new HashMap<>();
             error.put("error", "Email is already taken");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
         }
 
         // Instantiate the correct entity on the basis of role
@@ -67,11 +67,13 @@ public class AuthController{
         newUser.setRole(request.getRole().toUpperCase());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        userRepository.save(newUser);
+        User savedUser = userRepository.save(newUser);
 
-        Map<String, String> response = new HashMap<>();
+        Map<String, Object> response = new HashMap<>();
         response.put("message", "User registered successfully.");
-        return ResponseEntity.ok(response);
+        response.put("userId", savedUser.getUserId());
+        response.put("role", savedUser.getRole());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
@@ -85,10 +87,13 @@ public class AuthController{
             // If the password matches, fetch user details and generate JWT
             final UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
             final String jwt = jwtUtil.generateToken(userDetails.getUsername());
+            User user = userRepository.findByEmail(request.getEmail()).orElseThrow();
 
             // Return token in a JSON response
-            Map<String, String> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("token", jwt);
+            response.put("userId", user.getUserId());
+            response.put("role", user.getRole());
 
             // The below line would return unformatted text, so Postman would receive that unformatted text
             // return ResponseEntity.ok(jwt);
@@ -101,7 +106,7 @@ public class AuthController{
         catch(Exception e){
             Map<String, String> errorResponse = new HashMap<>();
             errorResponse.put("error", "Login failed: Bad credentials or user not found");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
         }
     }
 }

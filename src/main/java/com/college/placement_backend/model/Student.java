@@ -1,6 +1,7 @@
 package com.college.placement_backend.model;
 
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Entity;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public class Student extends User{
     // We cannot store a java array in a single column,
     // ElementCollection tag creates a secondary hidden table,
     // to hold the skills and link them back to the student
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> skills;
 
     public Student(){}

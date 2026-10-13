@@ -29,26 +29,31 @@ public class JwtFilter extends OncePerRequestFilter{
         String username = null;
         String jwt = null;
 
-        // Check if header exists and starts with "Bearer" (JWT format)
-        if(authHeader != null && authHeader.startsWith("Bearer ")){
-            // Skip 7 letters of "Bearer "
-            jwt = authHeader.substring(7);
-            // Read username from the token
-            username = jwtUtil.extractUsername(jwt);
-        }
-
-        // Username got found but the user isn't authenticated in the session
-        if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            // Fetch the user from MySQL database
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-            // Request JWT to mathematically validate the token
-            if(jwtUtil.validateToken(jwt, userDetails.getUsername())){
-                // If valid, log the user in Spring Security
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        try{
+            // Check if header exists and starts with "Bearer" (JWT format)
+            if(authHeader != null && authHeader.startsWith("Bearer ")){
+                // Skip 7 letters of "Bearer "
+                jwt = authHeader.substring(7);
+                // Read username from the token
+                username = jwtUtil.extractUsername(jwt);
             }
+
+            // Username got found but the user isn't authenticated in the session
+            if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
+                // Fetch the user from MySQL database
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+
+                // Request JWT to mathematically validate the token
+                if(jwtUtil.validateToken(jwt, userDetails.getUsername())){
+                    // If valid, log the user in Spring Security
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
+            }
+        }
+        catch(Exception ignored){
+            // Expired JWT or invalid auth
         }
 
         // Let the request continue to the next filter

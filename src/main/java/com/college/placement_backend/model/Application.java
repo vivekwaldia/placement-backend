@@ -3,6 +3,7 @@ package com.college.placement_backend.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "job_id"}))
 public class Application{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

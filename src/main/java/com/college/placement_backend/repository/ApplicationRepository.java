@@ -4,7 +4,10 @@ import com.college.placement_backend.model.Student;
 import com.college.placement_backend.model.Job;
 import com.college.placement_backend.model.Application;
 import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.List;
 
 public interface ApplicationRepository extends JpaRepository<Application, Integer>{
     boolean existsByStudentAndJob(Student student, Job job);
+    List<Application> findByStudent(Student student);
+    List<Application> findByJob(Job job);
 }

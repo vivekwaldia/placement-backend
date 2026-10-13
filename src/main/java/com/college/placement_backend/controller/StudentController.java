@@ -3,15 +3,17 @@
 
 package com.college.placement_backend.controller;
 
-import com.college.placement_backend.model.Student;
 import com.college.placement_backend.dto.StudentRequestDTO;
+import com.college.placement_backend.model.Application;
+import com.college.placement_backend.model.Student;
 import com.college.placement_backend.repository.StudentRepository;
 import com.college.placement_backend.service.PlacementService;
-
 import jakarta.validation.Valid;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 // Notify spring boot that this class handles HTTP Requests
@@ -39,17 +41,28 @@ public class StudentController{
     // Application trigger
     @PreAuthorize("hasAuthority('STUDENT')")
     @PostMapping("/{studentId}/apply/{jobId}") // Triggering an action
-    public String apply(@PathVariable Integer studentId, @PathVariable Integer jobId){
-        return placementService.applyForJob(studentId, jobId);
+    public Application apply(@PathVariable Integer studentId, @PathVariable Integer jobId, Authentication authentication){
+        return placementService.applyForJob(studentId, jobId, authentication.getName());
+    }
+
+    @PreAuthorize("hasAuthority('STUDENT')")
+    @GetMapping("/{studentId}/applications")
+    public List<Application> getMyApplications(@PathVariable Integer studentId, Authentication authentication){
+        return placementService.getStudentApplications(studentId, authentication.getName());
     }
 
     // @Valid -> Impose safety rules defined like DecimalMax
     @PreAuthorize("hasAuthority('STUDENT')")
     @PutMapping("/{id}/profile")
-    public Student updateStudentProfile(@PathVariable Integer id, @Valid @RequestBody StudentRequestDTO studentDTO){
+    public Student updateStudentProfile(@PathVariable Integer id, @Valid @RequestBody StudentRequestDTO studentDTO, Authentication authentication){
         Student student = studentRepository.findById(id).orElseThrow(
-            () -> new RuntimeException("Student not found")
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found")
         );
+
+        if(!student.getEmail().equalsIgnoreCase(authentication.getName())){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update your own profile.");
+        }
+
         student.setCgpa(studentDTO.getCgpa());
         student.setSkills(studentDTO.getSkills());
         return studentRepository.save(student);

@@ -2,9 +2,12 @@ package com.college.placement_backend;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
+
 import io.swagger.v3.oas.annotations.Hidden;
 import com.college.placement_backend.exception.IneligibleCGPAException;
 import java.time.LocalDateTime;
@@ -26,6 +29,16 @@ public class GlobalExceptionHandler{
     @ExceptionHandler(IneligibleCGPAException.class)
     public ResponseEntity<Map<String, Object>> handleIneligibleCGPA(IneligibleCGPAException e){
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleResponseStatusException(ResponseStatusException e){
+        return buildErrorResponse(HttpStatus.valueOf(e.getStatusCode().value()), e.getReason());
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDeniedException(AccessDeniedException e){
+        return buildErrorResponse(HttpStatus.FORBIDDEN, "Access Denied: Insufficient permissions.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
