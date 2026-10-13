@@ -28,12 +28,14 @@ public class GlobalExceptionHandler{
         return buildErrorResponse(HttpStatus.BAD_REQUEST, e.getMessage());
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     // Handle empty fields, etc...
     public ResponseEntity<Map<String, Object>> handleValidationErrors(MethodArgumentNotValidException e){
         String errorMsg = e.getBindingResult().getFieldErrors().get(0).getDefaultMessage();
         return buildErrorResponse(HttpStatus.BAD_REQUEST, errorMsg);
     }
 
+    @ExceptionHandler(Exception.class)
     // Fallbacks, any other crashes
     public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception e){
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred.");

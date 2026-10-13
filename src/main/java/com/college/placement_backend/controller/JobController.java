@@ -48,6 +48,7 @@ public class JobController{
         return jobRepository.save(newJob);
     }
 
+    @CacheEvict(value = "jobs", allEntries = true)
     @PreAuthorize("hasAuthority('COMPANY')")
     // Listen for HTTP delete requests, this uses dynamic path variable
     @DeleteMapping("/{id}")
