@@ -32,7 +32,7 @@ public class SecurityConfig{
         http.authorizeHttpRequests(auth -> 
             // Allow anyone to view Swagger UI, Redis tests, and future login/register endpoints
             // .anyRequest().authenticated() requires a valid token for any other type of request
-            auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api/auth/**", "/error").permitAll().anyRequest().authenticated()
+            auth.requestMatchers("/", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api/auth/**", "/error").permitAll().anyRequest().authenticated()
         );
 
         // Notify Spring if there are no server side sessions (stateless)
