@@ -5,11 +5,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import io.swagger.v3.oas.annotations.Hidden;
 import com.college.placement_backend.exception.IneligibleCGPAException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Hidden
 @RestControllerAdvice
 public class GlobalExceptionHandler{
     private ResponseEntity<Map<String, Object>> buildErrorResponse(HttpStatus status, String message){
