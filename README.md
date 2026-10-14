@@ -19,7 +19,7 @@ A RESTful backend built with **Java 21** and **Spring Boot 4.1** for managing ca
 ## System Architecture
 
 ```mermaid
-flowchart LR
+flowchart TD
     Client(["Client / Swagger UI"]) -->|"Bearer JWT"| Security["JwtFilter & SecurityConfig"]
     Security --> Controllers["REST Controllers"]
     Controllers -->|"Read / Evict"| Redis[("Redis Cache\n(JSON, 10m TTL)")]
@@ -182,9 +182,3 @@ $env:DB_PASS="your_mysql_password"; $env:JWT_SECRET="your_256_bit_secret_key_at_
 ```
 
 Open `http://localhost:8080/swagger-ui/index.html` to test the endpoints.
-
----
-
-## Contact
-
-**Vivek** - [waldia.vivek@gmail.com](mailto:waldia.vivek@gmail.com)
